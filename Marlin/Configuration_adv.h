@@ -327,9 +327,9 @@
  * The fan will turn on automatically whenever any stepper is enabled
  * and turn off after a set period after all steppers are turned off.
  */
-//#define USE_CONTROLLER_FAN
+#define USE_CONTROLLER_FAN
 #if ENABLED(USE_CONTROLLER_FAN)
-  //#define CONTROLLER_FAN_PIN -1           // Set a custom pin for the controller fan
+  #define CONTROLLER_FAN_PIN P1_26           // Set a custom pin for the controller fan
   #define CONTROLLERFAN_SECS 60             // Duration in seconds for the fan to run after all motors are disabled
   #define CONTROLLERFAN_SPEED 255           // 255 == full speed
   //#define CONTROLLERFAN_SPEED_Z_ONLY 127  // Reduce noise on machines that keep Z enabled
@@ -399,8 +399,8 @@
  * Multiple extruders can be assigned to the same pin in which case
  * the fan will turn on when any selected extruder is above the threshold.
  */
-#define E0_AUTO_FAN_PIN -1
-#define E1_AUTO_FAN_PIN -1
+#define E0_AUTO_FAN_PIN FAN1_PIN
+#define E1_AUTO_FAN_PIN FAN1_PIN //WARNING: FAN1_PIN imply thermalManager.fan_speed[1]
 #define E2_AUTO_FAN_PIN -1
 #define E3_AUTO_FAN_PIN -1
 #define E4_AUTO_FAN_PIN -1
@@ -1513,11 +1513,16 @@
   #define G38_MINIMUM_MOVE 0.0275 // (mm) Minimum distance that will produce a move.
 #endif
 
+// given 16 the standard microsteps, this is the factor for x and y
+#define MICROSTEPS_FACTOR  4
+
 // Moves (or segments) with fewer steps than this will be joined with the next move
 #define MIN_STEPS_PER_SEGMENT 6
+//*MICROSTEPS_FACTOR
 
 /**
- * Minimum delay before and after setting the stepper DIR (in ns)
+ * Mini
+ * mum delay before and after setting the stepper DIR (in ns)
  *     0 : No delay (Expect at least 10µS since one Stepper ISR must transpire)
  *    20 : Minimum for TMC2xxx drivers
  *   200 : Minimum for A4988 drivers
@@ -1562,7 +1567,7 @@
 // @section temperature
 
 // Control heater 0 and heater 1 in parallel.
-//#define HEATERS_PARALLEL
+// #define HEATERS_PARALLEL
 
 //===========================================================================
 //================================= Buffers =================================
@@ -1591,7 +1596,7 @@
 // For debug-echo: 128 bytes for the optimal speed.
 // Other output doesn't need to be that speedy.
 // :[0, 2, 4, 8, 16, 32, 64, 128, 256]
-#define TX_BUFFER_SIZE 0
+#define TX_BUFFER_SIZE 4
 
 // Host Receive Buffer Size
 // Without XON/XOFF flow control (see SERIAL_XON_XOFF below) 32 bytes should be enough.
@@ -1602,7 +1607,8 @@
 #if RX_BUFFER_SIZE >= 1024
   // Enable to have the controller send XON/XOFF control characters to
   // the host to signal the RX buffer is becoming full.
-  //#define SERIAL_XON_XOFF
+  //
+  #define SERIAL_XON_XOFF
 #endif
 
 // Add M575 G-code to change the baud rate
@@ -1878,53 +1884,52 @@
 
   #define HOLD_MULTIPLIER    0.5  // Scales down the holding current from run current
   #define INTERPOLATE       true  // Interpolate X/Y/Z_MICROSTEPS to 256
-
   #if AXIS_IS_TMC(X)
-    #define X_CURRENT       800        // (mA) RMS current. Multiply by 1.414 for peak current.
+    #define X_CURRENT     600  // (mA) RMS current. Multiply by 1.414 for peak current.
     #define X_CURRENT_HOME  X_CURRENT  // (mA) RMS current for sensorless homing
-    #define X_MICROSTEPS     16    // 0..256
-    #define X_RSENSE          0.11
-    #define X_CHAIN_POS      -1    // <=0 : Not chained. 1 : MCU MOSI connected. 2 : Next in chain, ...
+    #define X_MICROSTEPS   16*MICROSTEPS_FACTOR  // 0..256
+    #define X_RSENSE     0.11
+    #define X_CHAIN_POS    -1  // <=0 : Not chained. 1 : MCU MOSI connected. 2 : Next in chain, ...
   #endif
 
   #if AXIS_IS_TMC(X2)
-    #define X2_CURRENT      800
-    #define X2_CURRENT_HOME X2_CURRENT
-    #define X2_MICROSTEPS    16
-    #define X2_RSENSE         0.11
-    #define X2_CHAIN_POS     -1
+    #define X2_CURRENT    800
+    #define X2_CURRENT_HOME  X2_CURRENT
+    #define X2_MICROSTEPS  16*MICROSTEPS_FACTOR
+    #define X2_RSENSE    0.11
+    #define X2_CHAIN_POS   -1
   #endif
 
   #if AXIS_IS_TMC(Y)
-    #define Y_CURRENT       800
+    #define Y_CURRENT     600
     #define Y_CURRENT_HOME  Y_CURRENT
-    #define Y_MICROSTEPS     16
-    #define Y_RSENSE          0.11
-    #define Y_CHAIN_POS      -1
+    #define Y_MICROSTEPS   16*MICROSTEPS_FACTOR
+    #define Y_RSENSE     0.11
+    #define Y_CHAIN_POS    -1
   #endif
 
   #if AXIS_IS_TMC(Y2)
-    #define Y2_CURRENT      800
-    #define Y2_CURRENT_HOME Y2_CURRENT
-    #define Y2_MICROSTEPS    16
-    #define Y2_RSENSE         0.11
-    #define Y2_CHAIN_POS     -1
+    #define Y2_CURRENT    800
+    #define Y2_CURRENT_HOME  Y2_CURRENT
+    #define Y2_MICROSTEPS  16*MICROSTEPS_FACTOR
+    #define Y2_RSENSE    0.11
+    #define Y2_CHAIN_POS   -1
   #endif
 
   #if AXIS_IS_TMC(Z)
-    #define Z_CURRENT       800
+    #define Z_CURRENT     977
     #define Z_CURRENT_HOME  Z_CURRENT
-    #define Z_MICROSTEPS     16
-    #define Z_RSENSE          0.11
-    #define Z_CHAIN_POS      -1
+    #define Z_MICROSTEPS   16
+    #define Z_RSENSE     0.11
+    #define Z_CHAIN_POS    -1
   #endif
 
   #if AXIS_IS_TMC(Z2)
-    #define Z2_CURRENT      800
-    #define Z2_CURRENT_HOME Z2_CURRENT
-    #define Z2_MICROSTEPS    16
-    #define Z2_RSENSE         0.11
-    #define Z2_CHAIN_POS     -1
+    #define Z2_CURRENT    600
+    #define Z2_CURRENT_HOME  Z2_CURRENT
+    #define Z2_MICROSTEPS  16
+    #define Z2_RSENSE    0.11
+    #define Z2_CHAIN_POS   -1
   #endif
 
   #if AXIS_IS_TMC(Z3)
@@ -1936,17 +1941,17 @@
   #endif
 
   #if AXIS_IS_TMC(E0)
-    #define E0_CURRENT      800
-    #define E0_MICROSTEPS    16
-    #define E0_RSENSE         0.11
-    #define E0_CHAIN_POS     -1
+    #define E0_CURRENT    700
+    #define E0_MICROSTEPS  16
+    #define E0_RSENSE    0.11
+    #define E0_CHAIN_POS   -1
   #endif
 
   #if AXIS_IS_TMC(E1)
-    #define E1_CURRENT      800
-    #define E1_MICROSTEPS    16
-    #define E1_RSENSE         0.11
-    #define E1_CHAIN_POS     -1
+    #define E1_CURRENT    600
+    #define E1_MICROSTEPS  16
+    #define E1_RSENSE    0.11
+    #define E1_CHAIN_POS   -1
   #endif
 
   #if AXIS_IS_TMC(E2)
@@ -2037,7 +2042,7 @@
    * Use for drivers that do not use a dedicated enable pin, but rather handle the same
    * function through a communication line such as SPI or UART.
    */
-  //#define SOFTWARE_DRIVER_ENABLE
+  //  #define SOFTWARE_DRIVER_ENABLE
 
   /**
    * TMC2130, TMC2160, TMC2208, TMC2209, TMC5130 and TMC5160 only
@@ -2075,7 +2080,7 @@
    * M912 - Clear stepper driver overtemperature pre-warn condition flag.
    * M122 - Report driver parameters (Requires TMC_DEBUG)
    */
-  //#define MONITOR_DRIVER_STATUS
+  #define MONITOR_DRIVER_STATUS
 
   #if ENABLED(MONITOR_DRIVER_STATUS)
     #define CURRENT_STEP_DOWN     50  // [mA]
@@ -2090,7 +2095,8 @@
    * STEALTHCHOP_(XY|Z|E) must be enabled to use HYBRID_THRESHOLD.
    * M913 X/Y/Z/E to live tune the setting
    */
-  //#define HYBRID_THRESHOLD
+  //
+  #define HYBRID_THRESHOLD
 
   #define X_HYBRID_THRESHOLD     100  // [mm/s]
   #define X2_HYBRID_THRESHOLD    100
@@ -2162,7 +2168,8 @@
    * Enable M122 debugging command for TMC stepper drivers.
    * M122 S0/1 will enable continous reporting.
    */
-  //#define TMC_DEBUG
+  //
+  #define TMC_DEBUG
 
   /**
    * You can set your own advanced settings by filling in predefined functions.
